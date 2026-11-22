@@ -20,10 +20,14 @@ import java.util.Base64;
 public class JiraClient {
 
     // 1. SUAS CREDENCIAIS DO JIRA (Preencha com os dados do seu grupo)
-    private static final String JIRA_DOMINIO = "https://SEU-DOMINIO.atlassian.net";
-    private static final String JIRA_EMAIL = "seu-email@dominio.com";
-    private static final String JIRA_API_TOKEN = "SEU_TOKEN_AQUI";
+    private static final String JIRA_DOMINIO =
+            System.getenv("JIRA_DOMINIO");
 
+    private static final String JIRA_EMAIL =
+            System.getenv("JIRA_EMAIL");
+
+    private static final String JIRA_API_TOKEN =
+            System.getenv("JIRA_API_TOKEN");
     // Ferramentas que o Java vai usar para navegar na internet e ler JSON
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final Gson gson = new Gson();
@@ -32,7 +36,7 @@ public class JiraClient {
     public String buscarChamadosPorResponsavel(String responsavel) throws IOException, InterruptedException {
 
         // Passo A: Monta a pergunta na linguagem do Jira (JQL)
-        String jql = "assignee ~ \"" + responsavel + "\" ORDER BY created DESC";
+        String jql = "assignee = currentUser() ORDER BY created DESC";
         String jqlCodificada = URLEncoder.encode(jql, StandardCharsets.UTF_8);
         String url = JIRA_DOMINIO + "/rest/api/3/search/jql?jql=" + jqlCodificada
                 + "&fields=summary,status,priority,created,resolutiondate";
